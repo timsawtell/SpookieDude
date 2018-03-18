@@ -1,5 +1,5 @@
 import { Drawable, Vector } from "../drawable"
-import { Square } from "./square"
+import { Square, SquareContents } from "./square"
 import { Player } from "../player/player"
 import { Ghost } from "../ghost/ghost"
 
@@ -83,12 +83,34 @@ export class Board extends Drawable {
         const destinationVector = this.playerSquare.boardVector
         const currentVector = this.ghostSquare.boardVector
 
-        let nextVector = currentVector
+        let nextVector: Vector = {
+            x: currentVector.x,
+            y: currentVector.y
+        }
 
         if (destinationVector.x > currentVector.x) {
-            if (this.isValidXMove(nextVector.x + 1, this.ghostSquare)) {
+            if (this.isValidXMove(1, this.ghostSquare)) {
                 nextVector.x = nextVector.x + 1
             }
+        } else if (destinationVector.x < currentVector.x) {
+            if (this.isValidXMove(- 1, this.ghostSquare)) {
+                nextVector.x = nextVector.x - 1
+            }
+        } else if (destinationVector.y > currentVector.y) {
+            if (this.isValidYMove(1, this.ghostSquare)) {
+                nextVector.y = nextVector.y + 1
+            }
+        } else if (destinationVector.y < currentVector.y) {
+            if (this.isValidYMove(- 1, this.ghostSquare)) {
+                nextVector.y = nextVector.y - 1
+            }
+        }
+
+        if (nextVector.x !== currentVector.x || nextVector.y !== currentVector.y) {
+            const oldGhostSquare = this.ghostSquare
+            this.ghostSquare = this.squares[nextVector.y][nextVector.x]
+            this.ghostSquare.contents = "ghost"
+            oldGhostSquare.contents = "blank"
         }
     }
 
@@ -130,28 +152,29 @@ export class Board extends Drawable {
     }
 
     isValidXMove(intendedXDelta: number, squareInQuestion: Square): boolean {
-        const intendedX = this.playerSquare.boardVector.x + intendedXDelta
+        const intendedX = squareInQuestion.boardVector.x + intendedXDelta
         if (intendedX < 0) {
             return false
         }
         if (intendedX > this.numberOfXSquares) {
             return false
         }
-        if (this.squares[this.playerSquare.boardVector.y][intendedX].contents !== "blank") {
+        if (this.squares[squareInQuestion.boardVector.y][intendedX].contents !== "blank") {
             return false
         }
         return true
     }
 
     isValidYMove(intendedYDelta: number, squareInQuestion: Square): boolean {
-        const intendedY = this.playerSquare.boardVector.y + intendedYDelta
+        const intendedY = squareInQuestion.boardVector.y + intendedYDelta
         if (intendedY < 0) {
             return false
         }
         if (intendedY > this.numberOfYSquares) {
             return false
         }
-        if (this.squares[intendedY][this.playerSquare.boardVector.x].contents !== "blank") {
+        
+        if (this.squares[intendedY][squareInQuestion.boardVector.x].contents !== "blank") {
             return false
         }
         return true

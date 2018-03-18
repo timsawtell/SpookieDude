@@ -1,9 +1,11 @@
 import { Drawable } from "../drawable";
 
+export type SquareContents = "player" | "scenery" | "ghost" | "blank"
+
 export class Square extends Drawable {
 
     width: number
-    contents: "player" | "scenery" | "ghost" | "blank"
+    contents: SquareContents
 
     constructor(row: number, column: number, width: number) {
         super()
@@ -27,7 +29,7 @@ export class Square extends Drawable {
         context.lineTo(this.canvasVector.x, this.canvasVector.y + this.width)
         context.lineTo(this.canvasVector.x, this.canvasVector.y)
         context.stroke();
-
+        context.font = "18px Arial"
         // draw your contents
         switch (this.contents) {
             case "player":

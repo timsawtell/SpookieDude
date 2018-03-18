@@ -20,13 +20,20 @@ export class Engine {
         this.board.canvasVector.x = this.board.canvasVector.y = 0
 
         this.runLoop()
+        this.recursiveHunt()
         this.check = this.check.bind(this)
     }
 
     runLoop() {
-        
         this.board.draw(this.context)
-        
+    }
+
+    recursiveHunt() {
+        setTimeout(() => {
+            this.board.ghostHunt()
+            this.board.draw(this.context)
+            this.recursiveHunt()
+        }, 1000);
     }
 
     check(e: KeyboardEvent) {
