@@ -1,0 +1,21 @@
+{
+  "name": "spookiedude",
+  "version": "1.0.0",
+  "description": "Spookie Dude!",
+  "main": "webpack.config.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^2.7.2",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.12"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-ts": "node_modules/.bin/tsc",
+    "webpack": "node_modules/.bin/webpack-cli",
+    "build": "npm run build-ts && npm run webpack && cp ./src/index.html ./dist"
+  },
+  "author": "",
+  "license": "ISC"
+}
