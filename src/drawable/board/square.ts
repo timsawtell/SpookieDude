@@ -1,11 +1,19 @@
-import { Drawable } from "../drawable";
+import { Drawable } from "../drawable"
 
 export type SquareContents = "player" | "scenery" | "ghost" | "blank"
+
+interface PathfindingData {
+    gCost: number
+    hCost: number
+    fCost: number
+}
 
 export class Square extends Drawable {
 
     width: number
     contents: SquareContents
+    pathFindingData: PathfindingData
+    isRed: boolean
 
     constructor(row: number, column: number, width: number) {
         super()
@@ -13,6 +21,8 @@ export class Square extends Drawable {
         this.boardVector.x = column
         this.width = this.height = width
         this.contents = "blank"
+        this.isRed = false
+        this.resetPathfinding()
     }
 
     draw(context: CanvasRenderingContext2D) {
@@ -35,15 +45,31 @@ export class Square extends Drawable {
             case "player":
                 context.fillText("player", this.canvasVector.x, this.canvasVector.y + 10, this.width)
                 break
-            case "scenery": 
+            case "scenery":
+                const rockImg = new Image()
+                rockImg.onload = () => {
+                    context.drawImage(rockImg, this.canvasVector.x, this.canvasVector.y)
+                }
                 context.fillText("scenery", this.canvasVector.x, this.canvasVector.y + 10, this.width)
                 break
             case "ghost":
                 context.fillText("ghost", this.canvasVector.x, this.canvasVector.y + 10, this.width)
                 break
         }
+        if (this.isRed) {
+            context.fillStyle = "red"
+            context.fill()
+        }
         
         context.restore();
+    }
+
+    resetPathfinding() {
+        this.pathFindingData = {
+            gCost: 0,
+            hCost: 0,
+            fCost: 0
+        }
     }
 
 }

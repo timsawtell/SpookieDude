@@ -2,6 +2,7 @@ import { Drawable, Vector } from "../drawable"
 import { Square, SquareContents } from "./square"
 import { Player } from "../player/player"
 import { Ghost } from "../ghost/ghost"
+import { travelCost } from "../../common/pathFinding"
 
 const squareWidth = 50
 const sceneryPercent = 0.1
@@ -24,13 +25,17 @@ export class Board extends Drawable {
     ghostSquare: Square
     numberOfXSquares: number
     numberOfYSquares: number
+    gameOver: boolean
 
     constructor(width: number, height: number, player: Player, ghost: Ghost) {
         super()
         this.width = width
         this.height = height
+        this.player = player
+        this.ghost = ghost
         this.numberOfXSquares = width / squareWidth
         this.numberOfYSquares = height / squareWidth
+        this.gameOver = false
 
         this.squares = new Array()
         for (let yStep = 0; yStep < this.numberOfYSquares; yStep++) {
@@ -76,10 +81,14 @@ export class Board extends Drawable {
         this.ghostSquare = this.squares[rowForGhost][columnForGhost]
     }
 
+
+
     /**
      * Make the ghost move after the player. Doesn't work yet / isn't cooridinated yet by enginge
      */
     ghostHunt() {
+            this.ghost.hunt(this, this.player)
+        /*
         const destinationVector = this.playerSquare.boardVector
         const currentVector = this.ghostSquare.boardVector
 
@@ -112,6 +121,18 @@ export class Board extends Drawable {
             this.ghostSquare.contents = "ghost"
             oldGhostSquare.contents = "blank"
         }
+        */
+    }
+
+    moveGhost(square: Square) {
+        if (square.contents === "player") {
+            this.gameOver = true
+            square.isRed = true
+        }
+        const oldGhostSquare = this.ghostSquare
+        this.ghostSquare = square
+        this.ghostSquare.contents = "ghost"
+        oldGhostSquare.contents = "blank"
     }
 
     movePlayer(direction: Direction): boolean {
@@ -188,5 +209,32 @@ export class Board extends Drawable {
                 this.squares[yStep][xStep].draw(context)
             }
         }
+    }
+
+    neighbors(square: Square) {
+        let neighbors: Square[] = new Array()
+        const north = square.boardVector.y > 0 ? this.squares[square.boardVector.y - 1][square.boardVector.x] : null
+        const south = square.boardVector.y < this.numberOfYSquares - 1 ? this.squares[square.boardVector.y + 1][square.boardVector.x] : null
+        const east = square.boardVector.x < this.numberOfXSquares - 1 ? this.squares[square.boardVector.y][square.boardVector.x + 1] : null
+        const west = square.boardVector.x > 0 ? this.squares[square.boardVector.y][square.boardVector.x - 1] : null
+        if (north && north.contents !== "scenery") {
+            neighbors.push(north)
+        }
+        if (south && south.contents !== "scenery") {
+            neighbors.push(south)
+        }
+        if (east && east.contents !== "scenery") {
+            neighbors.push(east)
+        }
+        if (west && west.contents !== "scenery") {
+            neighbors.push(west)
+        }
+        return neighbors
+    }
+
+    hCostForSquare(start: Square, end: Square) {
+        const xCost = Math.abs(start.boardVector.x - end.boardVector.x)
+        const yCost = Math.abs(start.boardVector.y - end.boardVector.y)
+        return (xCost * travelCost) + (yCost * travelCost)
     }
 }

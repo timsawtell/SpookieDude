@@ -32,6 +32,9 @@ export class Engine {
         setTimeout(() => {
             this.board.ghostHunt()
             this.board.draw(this.context)
+            if (this.board.gameOver) {
+                return
+            }
             this.recursiveHunt()
         }, 1000);
     }

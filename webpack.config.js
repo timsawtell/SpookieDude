@@ -3,5 +3,21 @@ module.exports = {
   output: {
     filename: './bundle.js'
   },
-  mode: 'development'
+  mode: 'development',
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name].[ext]',
+              outputPath: 'images/'
+            }  
+          }
+        ]
+      }
+    ]
+  }
 };
